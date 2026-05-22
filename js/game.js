@@ -572,10 +572,14 @@
         const cartes = window.SKPowers.voirDeckJuanita(state);
         state.messages.push('💎 Juanita Jade consulte ' + cartes.length + ' cartes restantes.');
         if (state.players[idx].isHuman && window.SKUI) {
-          window.SKUI.closePowerModal(function () {
-            window.SKUI.showJuanitaCards(cartes, function () {
-              terminerPouvoir();
-            });
+          window.SKUI.cleanupModalBackdrops();
+          const el = document.getElementById('powerActiveModal');
+          if (el) {
+            const inst = bootstrap.Modal.getInstance(el);
+            if (inst) inst.hide();
+          }
+          window.SKUI.showJuanitaCards(cartes, function () {
+            terminerPouvoir();
           });
         } else {
           terminerPouvoir();
@@ -599,6 +603,7 @@
    */
   function terminerPouvoir() {
     state.pendingPower = null;
+    if (window.SKUI) window.SKUI.cleanupModalBackdrops();
     emit();
     continueAfterTrick();
   }
@@ -608,6 +613,7 @@
    */
   function terminerPouvoirHarry() {
     state.pendingPower = null;
+    if (window.SKUI) window.SKUI.cleanupModalBackdrops();
     emit();
     calculerScoresManche();
   }

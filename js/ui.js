@@ -225,7 +225,9 @@
     const $btn = $('#btn-action');
     const hi = state.humanIndex;
 
-    if (state.pendingPower) {
+    if (state.pendingPower &&
+        state.pendingPower.playerIndex === hi &&
+        powerModalShowing) {
       $btn.prop('disabled', true).text('Pouvoir pirate en cours…');
       return;
     }
@@ -311,15 +313,27 @@
   }
 
   /**
-   * Supprime les backdrops Bootstrap orphelins qui bloquent l'écran.
+   * Supprime les backdrops Bootstrap orphelins (sans forcer la fermeture des modales).
    */
   function cleanupModalBackdrops() {
     $('.modal-backdrop').remove();
     $('body').removeClass('modal-open').css({ overflow: '', paddingRight: '' });
-    $('.modal.show').each(function () {
-      $(this).removeClass('show').attr('aria-hidden', 'true').css('display', 'none');
-    });
     powerModalShowing = false;
+  }
+
+  /**
+   * Valide un choix de pouvoir pirate et reprend le jeu immédiatement.
+   * @param {Object} action - Action passée à SKGame.executerActionPouvoir
+   */
+  function submitPowerAction(action) {
+    powerModalShowing = false;
+    const el = document.getElementById('powerActiveModal');
+    if (el) {
+      const inst = bootstrap.Modal.getInstance(el);
+      if (inst) inst.hide();
+    }
+    cleanupModalBackdrops();
+    window.SKGame.executerActionPouvoir(action);
   }
 
   /**
@@ -331,7 +345,7 @@
   function openModal(selector, onShown) {
     const el = document.querySelector(selector);
     if (!el) return null;
-    cleanupModalBackdrops();
+    $('.modal-backdrop').remove();
     const inst = bootstrap.Modal.getOrCreateInstance(el);
     if (onShown) {
       $(el).one('shown.bs.modal', onShown);
@@ -353,15 +367,19 @@
       return;
     }
     const inst = bootstrap.Modal.getInstance(el);
-    if (inst) {
-      $(el).one('hidden.bs.modal', function () {
-        cleanupModalBackdrops();
-        if (callback) callback();
-      });
-      inst.hide();
-    } else {
+    let finished = false;
+    function done() {
+      if (finished) return;
+      finished = true;
       cleanupModalBackdrops();
       if (callback) callback();
+    }
+    if (inst) {
+      $(el).one('hidden.bs.modal', done);
+      inst.hide();
+      setTimeout(done, 400);
+    } else {
+      done();
     }
   }
 
@@ -411,10 +429,7 @@
       });
       $body.append($list);
       $list.on('click', 'button', function () {
-        const target = $(this).data('target');
-        closePowerModal(function () {
-          window.SKGame.executerActionPouvoir({ type: 'rosie', targetIndex: target });
-        });
+        submitPowerAction({ type: 'rosie', targetIndex: $(this).data('target') });
       });
     } else if (power.step === 'will_discard') {
       selectedDiscardIds = [];
@@ -441,10 +456,7 @@
           .text('Défausser (' + selectedDiscardIds.length + '/' + need + ')');
       });
       $('#btn-will-discard').on('click', function () {
-        const ids = selectedDiscardIds.slice();
-        closePowerModal(function () {
-          window.SKGame.executerActionPouvoir({ type: 'will_discard', cardIds: ids });
-        });
+        submitPowerAction({ type: 'will_discard', cardIds: selectedDiscardIds.slice() });
       });
     } else if (power.pirateId === 'rascal') {
       $body.append('<p>Rascal le Flambeur : pariez des points supplémentaires :</p>');
@@ -456,10 +468,7 @@
         '</div>'
       );
       $body.find('button').on('click', function () {
-        const montant = parseInt($(this).data('montant'), 10);
-        closePowerModal(function () {
-          window.SKGame.executerActionPouvoir({ type: 'rascal', montant: montant });
-        });
+        submitPowerAction({ type: 'rascal', montant: parseInt($(this).data('montant'), 10) });
       });
     } else if (power.pirateId === 'juanita') {
       $body.append('<p>Juanita Jade révèle les cartes restantes du deck…</p>');
@@ -478,10 +487,7 @@
         '</div>'
       );
       $body.find('button').on('click', function () {
-        const delta = parseInt($(this).data('delta'), 10);
-        closePowerModal(function () {
-          window.SKGame.executerActionPouvoir({ type: 'harry', delta: delta });
-        });
+        submitPowerAction({ type: 'harry', delta: parseInt($(this).data('delta'), 10) });
       });
     }
 
@@ -528,7 +534,6 @@
         !$('#powerActiveModal').hasClass('show')) {
       showPowerModal(state);
     }
-    updateActionButton(state);
   }
 
   /**
@@ -578,6 +583,7 @@
     hidePowerModal,
     closePowerModal,
     cleanupModalBackdrops,
+    submitPowerAction,
     openModal,
     closeModal
   };
