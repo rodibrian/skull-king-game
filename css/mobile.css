@@ -1,0 +1,303 @@
+/* ==========================================================================
+   Skull King — Mobile Overrides (Samsung A25 — 360px)
+   ========================================================================== */
+
+@media (max-width: 360px) {
+  :root {
+    --header-h: 48px;
+  }
+
+  body {
+    font-size: 0.9rem;
+  }
+
+  .logo-skull {
+    font-size: 3rem;
+  }
+
+  .logo-title {
+    font-size: 2rem;
+  }
+
+  .menu-buttons {
+    max-width: 100%;
+    padding: 0 0.25rem;
+  }
+
+  .btn-pirate {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    min-height: 48px;
+  }
+
+  /* Game header compact */
+  .game-header-title {
+    font-size: 0.8rem;
+  }
+
+  .game-header-round {
+    font-size: 0.7rem;
+  }
+
+  .game-header-actions .btn-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  /* Smaller cards on tiny screens */
+  .card-game {
+    --card-w: 48px;
+    --card-h: 68px;
+  }
+
+  .human-area .card-game {
+    --card-w: 52px;
+    --card-h: 74px;
+  }
+
+  .hand-cards {
+    gap: 0.25rem;
+    padding: 0.4rem 0.5rem;
+    scroll-padding: 0.5rem;
+  }
+
+  /* Table fills available space */
+  .game-table {
+    max-height: calc(100vh - var(--header-h) - 260px);
+    border-width: 4px;
+  }
+
+  .game-table::before {
+    inset: -8px;
+  }
+
+  .trick-zone {
+    width: 48%;
+    height: 48%;
+  }
+
+  .trick-zone-label {
+    font-size: 0.55rem;
+  }
+
+  .player-badge {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.35rem;
+    max-width: 72px;
+  }
+
+  .player-badge .avatar {
+    width: 16px;
+    height: 16px;
+    font-size: 0.55rem;
+  }
+
+  .player-stats-mini {
+    font-size: 0.55rem;
+  }
+
+  /* Touch targets — minimum 48px */
+  .bid-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .game-panel-header {
+    min-height: 48px;
+  }
+
+  .action-area .btn-pirate {
+    min-height: 48px;
+    font-size: 0.85rem;
+  }
+
+  .human-info-bar {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  /* Score table scroll */
+  .score-table {
+    min-width: 360px;
+    font-size: 0.65rem;
+  }
+
+  .score-table th,
+  .score-table td {
+    padding: 0.3rem 0.25rem;
+  }
+
+  /* Modals full width feel */
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+
+  .modal-body {
+    padding: 0.75rem;
+  }
+
+  .player-slot {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .player-type-toggle {
+    justify-self: start;
+  }
+
+  /* Podium compact */
+  .podium-title {
+    font-size: 1.1rem;
+  }
+
+  .podium-winner-name {
+    font-size: 1.25rem;
+  }
+
+  .podium-winner-score {
+    font-size: 1.5rem;
+  }
+
+  .podium-actions {
+    grid-template-columns: 1fr;
+  }
+
+  /* Page headers */
+  .page-header h1 {
+    font-size: 1rem;
+  }
+
+  .page-content {
+    padding: 1rem 0.75rem 2rem;
+  }
+}
+
+/* ---- Swipe hand enhancement ---- */
+
+@media (max-width: 576px) {
+  .hand-cards {
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    touch-action: pan-x;
+  }
+
+  .hand-cards .card-game {
+    scroll-snap-align: center;
+    touch-action: manipulation;
+  }
+
+  /* Visual hint for swipe */
+  .hand-cards::after {
+    content: '';
+    flex-shrink: 0;
+    width: 0.5rem;
+  }
+
+  .human-area {
+    position: relative;
+  }
+
+  .swipe-hint {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+    pointer-events: none;
+    white-space: nowrap;
+    padding-bottom: 0.25rem;
+  }
+
+  .swipe-hint::before {
+    content: '← ';
+  }
+
+  .swipe-hint::after {
+    content: ' →';
+  }
+}
+
+/* ---- Touch-friendly spacing ---- */
+
+@media (hover: none) and (pointer: coarse) {
+  .card-game.playable:hover {
+    transform: none;
+  }
+
+  .card-game.playable:active {
+    transform: translateY(-4px);
+  }
+
+  .card-game.selected {
+    transform: translateY(-8px);
+  }
+
+  .btn-pirate:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .btn-pirate:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  /* Long-press tooltip handled by JS — ensure no hover-only styles block touch */
+  .card-game.playable:hover .card-face {
+    border-color: var(--success);
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-game.selected .card-face {
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 0 3px var(--gold-glow), var(--shadow-card);
+  }
+}
+
+/* ---- Landscape mobile ---- */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .game-table {
+    max-height: calc(100vh - var(--header-h) - 120px);
+    aspect-ratio: auto;
+    height: calc(100vh - var(--header-h) - 140px);
+  }
+
+  .human-area .hand-cards {
+    max-height: 90px;
+  }
+
+  .card-game {
+    --card-w: 40px;
+    --card-h: 56px;
+  }
+
+  .game-panels-row {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .game-panel {
+    flex: 0 0 auto;
+    min-width: 200px;
+  }
+}
+
+/* ---- Safe area insets (notched phones) ---- */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .human-area,
+  .action-area {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+
+  .game-header {
+    padding-top: env(safe-area-inset-top);
+    height: calc(var(--header-h) + env(safe-area-inset-top));
+  }
+
+  .game-screen {
+    padding-top: calc(var(--header-h) + env(safe-area-inset-top));
+  }
+}

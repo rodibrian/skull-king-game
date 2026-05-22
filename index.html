@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Skull King — Jeu de plis pirate en ligne">
+  <title>Skull King — Accueil</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Animate.css 4 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body class="pirate-bg">
+
+  <div class="fog-layer" aria-hidden="true">
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="home-wrapper">
+    <header class="logo-block animate__animated animate__fadeIn">
+      <div class="logo-skull animate-logo animate-logo-glow" aria-hidden="true">☠️</div>
+      <h1 class="logo-title animate-logo">Skull King</h1>
+      <p class="logo-subtitle">Capitaine des Sept Mers</p>
+    </header>
+
+    <nav class="menu-buttons animate__animated animate__fadeInUp animate__delay-1s" aria-label="Menu principal">
+      <button type="button" class="btn-pirate" id="btn-nouvelle-partie" data-bs-toggle="modal" data-bs-target="#configModal">
+        <span aria-hidden="true">⚔️</span> Nouvelle Partie
+      </button>
+      <button type="button" class="btn-pirate btn-pirate-outline" id="btn-reprendre" disabled>
+        <span aria-hidden="true">🔄</span> Reprendre
+      </button>
+      <a href="rules.html" class="btn-pirate btn-pirate-outline">
+        <span aria-hidden="true">📖</span> Règles
+      </a>
+      <a href="scores.html" class="btn-pirate btn-pirate-outline">
+        <span aria-hidden="true">🏆</span> Scores
+      </a>
+    </nav>
+  </div>
+
+  <!-- Modal Configuration -->
+  <div class="modal fade" id="configModal" tabindex="-1" aria-labelledby="configModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="configModalLabel">⚓ Configuration de la partie</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+
+          <!-- Joueurs -->
+          <section class="config-section" aria-labelledby="section-joueurs">
+            <h3 class="config-section-title" id="section-joueurs">
+              <span aria-hidden="true">👥</span> Joueurs
+            </h3>
+            <div class="mb-3">
+              <label for="player-count" class="form-label">Nombre de joueurs</label>
+              <select class="form-select" id="player-count" aria-describedby="player-count-help">
+                <option value="2">2 joueurs</option>
+                <option value="3">3 joueurs</option>
+                <option value="4" selected>4 joueurs</option>
+                <option value="5">5 joueurs</option>
+                <option value="6">6 joueurs</option>
+                <option value="7">7 joueurs</option>
+                <option value="8">8 joueurs</option>
+              </select>
+              <div id="player-count-help" class="form-text">De 2 à 8 joueurs, humains ou IA.</div>
+            </div>
+            <div id="player-slots" role="list" aria-label="Liste des joueurs">
+              <!-- Slots générés par JS -->
+            </div>
+          </section>
+
+          <!-- Extensions -->
+          <section class="config-section" aria-labelledby="section-extensions">
+            <h3 class="config-section-title" id="section-extensions">
+              <span aria-hidden="true">🐙</span> Extensions
+            </h3>
+            <div class="extension-card">
+              <span class="extension-icon" aria-hidden="true">🐙</span>
+              <div class="flex-grow-1">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="ext-kraken" name="extensions" value="kraken">
+                  <label class="form-check-label" for="ext-kraken">
+                    <strong>Kraken</strong> <span class="extension-badge">Extension</span>
+                  </label>
+                </div>
+                <p class="form-text mb-0">Détruit le pli — personne ne marque de points bonus.</p>
+              </div>
+            </div>
+            <div class="extension-card">
+              <span class="extension-icon" aria-hidden="true">🐋</span>
+              <div class="flex-grow-1">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="ext-baleine" name="extensions" value="baleine">
+                  <label class="form-check-label" for="ext-baleine">
+                    <strong>Baleine Blanche</strong> <span class="extension-badge">Extension</span>
+                  </label>
+                </div>
+                <p class="form-text mb-0">Inverse la hiérarchie des cartes numérotées dans le pli.</p>
+              </div>
+            </div>
+            <div class="extension-card">
+              <span class="extension-icon" aria-hidden="true">📦</span>
+              <div class="flex-grow-1">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="ext-butin" name="extensions" value="butin">
+                  <label class="form-check-label" for="ext-butin">
+                    <strong>Butin</strong> <span class="extension-badge">Extension</span>
+                  </label>
+                </div>
+                <p class="form-text mb-0">Alliance secrète entre deux joueurs pour des points bonus.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Système de score -->
+          <section class="config-section" aria-labelledby="section-scoring">
+            <h3 class="config-section-title" id="section-scoring">
+              <span aria-hidden="true">📊</span> Système de score
+            </h3>
+            <div class="mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="scoring-system" id="score-skull-king" value="skull_king" checked>
+                <label class="form-check-label" for="score-skull-king">
+                  <strong>Skull King</strong> — Classique, haute variance (+20 pts × mise exacte)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="scoring-system" id="score-rascal" value="rascal">
+                <label class="form-check-label" for="score-rascal">
+                  <strong>Rascal le Flambeur</strong> — Équilibré, faible variance (potentiel par manche)
+                </label>
+              </div>
+            </div>
+            <div id="rascal-options" class="ms-4" style="display:none;">
+              <p class="form-text">Option avancée Rascal :</p>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="rascal-variant" id="rascal-chevrotine" value="chevrotine" checked>
+                <label class="form-check-label" for="rascal-chevrotine">
+                  <strong>Chevrotine</strong> ✋ — Main ouverte (50% si écart de 1)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="rascal-variant" id="rascal-boulet" value="boulet">
+                <label class="form-check-label" for="rascal-boulet">
+                  <strong>Boulet de canon</strong> ✊ — Tout ou rien (+15 pts × cartes si exact)
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <!-- Variante -->
+          <section class="config-section" aria-labelledby="section-variante">
+            <h3 class="config-section-title" id="section-variante">
+              <span aria-hidden="true">🗺️</span> Variante de distribution
+            </h3>
+            <select class="form-select" id="game-variant" aria-describedby="variant-preview">
+              <option value="standard" selected>Standard — 10 manches (1 à 10 cartes)</option>
+              <option value="pas_impair">Pas d'impair — 2×2, 2×4, 2×6, 2×8, 2×10</option>
+              <option value="pret_combat">Prêt au combat — 5 manches : 6, 7, 8, 9, 10</option>
+              <option value="attaque_eclair">Attaque éclair — 5 manches de 5</option>
+              <option value="tir_barrage">Tir de barrage — 10 manches de 10</option>
+              <option value="tourbillon">Tourbillon — 2×9, 2×7, 2×5, 2×3, 2×1</option>
+              <option value="heure_dodo">L'heure du dodo — 1 manche, 1 carte</option>
+              <option value="personnalise">Personnalisé</option>
+            </select>
+            <div id="variant-preview" class="variant-preview">
+              10 manches · 1 carte (M1) → 10 cartes (M10)
+            </div>
+          </section>
+
+          <!-- Pouvoirs avancés -->
+          <section class="config-section" aria-labelledby="section-pouvoirs">
+            <h3 class="config-section-title" id="section-pouvoirs">
+              <span aria-hidden="true">🏴‍☠️</span> Pouvoirs avancés des pirates
+            </h3>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="advanced-powers" role="switch">
+              <label class="form-check-label" for="advanced-powers">
+                Activer les pouvoirs spéciaux des pirates
+              </label>
+            </div>
+            <div id="powers-description" class="form-text mt-2" style="display:none;">
+              <ul class="mb-0 ps-3">
+                <li><strong>Rosie la Douce</strong> — Regarde 2 cartes du deck</li>
+                <li><strong>Will le Bandit</strong> — Échange une carte avec un adversaire</li>
+                <li><strong>Rascal le Flambeur</strong> — Double ou annule sa mise</li>
+                <li><strong>Juanita Jade</strong> — Choisit qui commence le pli</li>
+                <li><strong>Harry le Géant</strong> — Force un adversaire à jouer en premier</li>
+              </ul>
+            </div>
+          </section>
+
+        </div>
+        <div class="modal-footer flex-column flex-sm-row gap-2">
+          <button type="button" class="btn btn-pirate-outline btn-pirate" data-bs-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-pirate" id="btn-start-game" disabled>
+            🏴‍☠️ Yo-ho-ho ! Commençons !
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery 3.7 -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var STORAGE_KEY = 'sk_game_state';
+    var PREFS_KEY = 'sk_preferences';
+    var DEFAULT_NAMES = ['Vous', 'Barbe Noire', 'Calico Jack', 'Anne Bonny', 'Barbe Rouge', 'Morgan', 'Drake', 'Kidd'];
+
+    var variantPreviews = {
+      standard: '10 manches · 1 carte (M1) → 10 cartes (M10)',
+      pas_impair: '5 manches · 2, 2, 4, 4, 6, 6, 8, 8, 10, 10 cartes',
+      pret_combat: '5 manches · 6, 7, 8, 9, 10 cartes',
+      attaque_eclair: '5 manches · 5 cartes chacune',
+      tir_barrage: '10 manches · 10 cartes chacune',
+      tourbillon: '10 manches · 9, 9, 7, 7, 5, 5, 3, 3, 1, 1 cartes',
+      heure_dodo: '1 manche · 1 carte',
+      personnalise: 'Configuration libre (à définir en jeu)'
+    };
+
+    function hasSavedGame() {
+      try {
+        return !!localStorage.getItem(STORAGE_KEY);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function buildPlayerSlots(count) {
+      var $container = $('#player-slots').empty();
+      for (var i = 0; i < 8; i++) {
+        var hidden = i >= count ? ' hidden' : '';
+        var isHuman = i === 0;
+        var $slot = $(
+          '<div class="player-slot' + hidden + '" data-slot="' + i + '" role="listitem">' +
+            '<span class="badge bg-secondary">J' + (i + 1) + '</span>' +
+            '<input type="text" class="form-control form-control-sm player-name" ' +
+              'value="' + DEFAULT_NAMES[i] + '" maxlength="16" aria-label="Nom joueur ' + (i + 1) + '">' +
+            '<div class="player-type-toggle btn-group" role="group" aria-label="Type joueur ' + (i + 1) + '">' +
+              '<input type="radio" class="btn-check player-type" name="type-' + i + '" id="human-' + i + '" value="human"' + (isHuman ? ' checked' : '') + '>' +
+              '<label class="btn btn-outline-warning btn-sm" for="human-' + i + '">👤</label>' +
+              '<input type="radio" class="btn-check player-type" name="type-' + i + '" id="ai-' + i + '" value="ai"' + (!isHuman ? ' checked' : '') + '>' +
+              '<label class="btn btn-outline-warning btn-sm" for="ai-' + i + '">🤖</label>' +
+            '</div>' +
+            '<select class="form-select form-select-sm ai-level" style="width:auto;' + (isHuman ? 'display:none' : '') + '" aria-label="Niveau IA joueur ' + (i + 1) + '">' +
+              '<option value="1">Moussaillon</option>' +
+              '<option value="2" selected>Matelot</option>' +
+              '<option value="3">Corsaire</option>' +
+              '<option value="4">Capitaine</option>' +
+            '</select>' +
+          '</div>'
+        );
+        $container.append($slot);
+      }
+      validateConfig();
+    }
+
+    function validateConfig() {
+      var count = parseInt($('#player-count').val(), 10);
+      var valid = count >= 2;
+      $('#btn-start-game').prop('disabled', !valid);
+    }
+
+    function getGameConfig() {
+      var count = parseInt($('#player-count').val(), 10);
+      var players = [];
+      for (var i = 0; i < count; i++) {
+        var $slot = $('.player-slot[data-slot="' + i + '"]');
+        var type = $slot.find('.player-type:checked').val();
+        if (i === 0 && type !== 'human') type = 'human';
+        players.push({
+          name: $slot.find('.player-name').val().trim() || DEFAULT_NAMES[i],
+          type: type,
+          aiLevel: parseInt($slot.find('.ai-level').val(), 10) || 2
+        });
+      }
+      return {
+        playerCount: count,
+        players: players,
+        extensions: {
+          kraken: $('#ext-kraken').is(':checked'),
+          baleine: $('#ext-baleine').is(':checked'),
+          butin: $('#ext-butin').is(':checked')
+        },
+        scoring: {
+          system: $('input[name="scoring-system"]:checked').val(),
+          rascalVariant: $('input[name="rascal-variant"]:checked').val()
+        },
+        variant: $('#game-variant').val(),
+        advancedPowers: $('#advanced-powers').is(':checked')
+      };
+    }
+
+    function startGame() {
+      var config = getGameConfig();
+      try {
+        localStorage.setItem(PREFS_KEY, JSON.stringify(config));
+        sessionStorage.setItem('sk_new_game_config', JSON.stringify(config));
+      } catch (e) { /* ignore */ }
+      window.location.href = 'game.html';
+    }
+
+    $(function () {
+      // Reprendre button
+      if (hasSavedGame()) {
+        $('#btn-reprendre').prop('disabled', false).on('click', function () {
+          window.location.href = 'game.html?resume=1';
+        });
+      }
+
+      buildPlayerSlots(4);
+
+      $('#player-count').on('change', function () {
+        var count = parseInt($(this).val(), 10);
+        $('.player-slot').each(function (i) {
+          $(this).toggleClass('hidden', i >= count);
+        });
+        validateConfig();
+      });
+
+      $(document).on('change', '.player-type', function () {
+        var $slot = $(this).closest('.player-slot');
+        var isAI = $slot.find('.player-type:checked').val() === 'ai';
+        $slot.find('.ai-level').toggle(isAI);
+      });
+
+      $('input[name="scoring-system"]').on('change', function () {
+        $('#rascal-options').toggle($('#score-rascal').is(':checked'));
+      });
+
+      $('#game-variant').on('change', function () {
+        var key = $(this).val();
+        $('#variant-preview').text(variantPreviews[key] || '');
+      });
+
+      $('#advanced-powers').on('change', function () {
+        $('#powers-description').toggle($(this).is(':checked'));
+      });
+
+      $('#btn-start-game').on('click', startGame);
+
+      // Load saved preferences
+      try {
+        var prefs = JSON.parse(localStorage.getItem(PREFS_KEY));
+        if (prefs) {
+          if (prefs.playerCount) {
+            $('#player-count').val(prefs.playerCount).trigger('change');
+          }
+          if (prefs.extensions) {
+            $('#ext-kraken').prop('checked', prefs.extensions.kraken);
+            $('#ext-baleine').prop('checked', prefs.extensions.baleine);
+            $('#ext-butin').prop('checked', prefs.extensions.butin);
+          }
+          if (prefs.scoring) {
+            $('input[name="scoring-system"][value="' + prefs.scoring.system + '"]').prop('checked', true).trigger('change');
+            if (prefs.scoring.rascalVariant) {
+              $('input[name="rascal-variant"][value="' + prefs.scoring.rascalVariant + '"]').prop('checked', true);
+            }
+          }
+          if (prefs.variant) {
+            $('#game-variant').val(prefs.variant).trigger('change');
+          }
+          if (prefs.advancedPowers) {
+            $('#advanced-powers').prop('checked', true).trigger('change');
+          }
+        }
+      } catch (e) { /* ignore */ }
+    });
+  })();
+  </script>
+</body>
+</html>

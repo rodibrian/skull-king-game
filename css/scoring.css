@@ -1,0 +1,420 @@
+/* ==========================================================================
+   Skull King — Scoring UI
+   ========================================================================== */
+
+.score-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(212, 160, 23, 0.2);
+}
+
+.score-table {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.score-table thead {
+  background: rgba(0, 0, 0, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.score-table th {
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--gold-primary);
+  padding: 0.5rem 0.4rem;
+  text-align: center;
+  border-bottom: 2px solid var(--gold-shadow);
+  white-space: nowrap;
+}
+
+.score-table td {
+  padding: 0.4rem 0.35rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(212, 160, 23, 0.08);
+  color: var(--text-primary);
+  transition: background 0.2s ease;
+}
+
+.score-table tbody tr:hover td {
+  background: rgba(212, 160, 23, 0.05);
+}
+
+.score-table .col-player {
+  text-align: left;
+  font-weight: 600;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score-table .col-round {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+
+/* ---- Score values ---- */
+
+.score-positive {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.score-negative {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.score-neutral {
+  color: var(--text-muted);
+}
+
+.score-cumulative {
+  font-family: var(--font-title);
+  font-weight: 700;
+  color: var(--gold-bright);
+  font-size: 0.85rem;
+}
+
+.score-cumulative.leader {
+  position: relative;
+}
+
+.score-cumulative.leader::before {
+  content: '👑';
+  margin-right: 0.2rem;
+  font-size: 0.75rem;
+}
+
+/* ---- Perfect bid animation ---- */
+
+.score-cell.perfect-bid {
+  background: rgba(39, 174, 96, 0.2) !important;
+  animation: perfect-bid-pulse 1s ease-in-out;
+}
+
+@keyframes perfect-bid-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 0 0 rgba(245, 200, 66, 0);
+  }
+  50% {
+    box-shadow: inset 0 0 20px rgba(245, 200, 66, 0.4);
+    background: rgba(39, 174, 96, 0.35) !important;
+  }
+}
+
+/* ---- Failed bid ---- */
+
+.score-cell.failed-bid {
+  animation: shake-fail 0.5s ease-in-out;
+  background: rgba(192, 57, 43, 0.15) !important;
+}
+
+/* ---- Bonus badges ---- */
+
+.bonus-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.bonus-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-card);
+  font-size: 0.75rem;
+  border-left: 3px solid var(--gold-primary);
+}
+
+.bonus-item .bonus-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.bonus-item .bonus-label {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.bonus-item .bonus-value {
+  font-weight: 700;
+  color: var(--success);
+  font-family: var(--font-title);
+}
+
+.bonus-item.animate-in {
+  animation: bonus-slide-in 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes bonus-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ---- Bonus type colors ---- */
+
+.bonus-item.bonus-14-color { border-left-color: var(--success); }
+.bonus-item.bonus-14-black { border-left-color: #333; }
+.bonus-item.bonus-pirate-siren { border-left-color: var(--warning); }
+.bonus-item.bonus-sk-pirate { border-left-color: var(--danger); }
+.bonus-item.bonus-siren-sk { border-left-color: var(--info); }
+.bonus-item.bonus-butin { border-left-color: var(--gold-bright); }
+
+/* ---- Bid panel ---- */
+
+.bid-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bid-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.bid-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-shadow);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--text-primary);
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.bid-btn:hover,
+.bid-btn.selected {
+  background: var(--gold-primary);
+  color: var(--bg-dark);
+  border-color: var(--gold-bright);
+  transform: scale(1.08);
+}
+
+.bid-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.bid-reveal-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
+.bid-player-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+}
+
+.bid-player-reveal .name {
+  color: var(--text-muted);
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Rascal chevrotine/boulet ---- */
+
+.rascal-choice {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.rascal-choice .btn-rascal {
+  flex: 1;
+  padding: 0.6rem;
+  font-size: 0.75rem;
+  border-radius: var(--radius-card);
+  border: 2px solid rgba(212, 160, 23, 0.3);
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition);
+  min-height: 48px;
+}
+
+.rascal-choice .btn-rascal.selected {
+  border-color: var(--gold-bright);
+  background: rgba(212, 160, 23, 0.2);
+}
+
+.rascal-choice .btn-rascal .emoji {
+  display: block;
+  font-size: 1.25rem;
+  margin-bottom: 0.15rem;
+}
+
+/* ---- Game end podium ---- */
+
+.podium-modal .modal-content {
+  background: linear-gradient(180deg, #1a1208 0%, #0f0a04 100%);
+  border: 3px solid var(--gold-primary);
+}
+
+.podium-header {
+  text-align: center;
+  padding: 1.5rem 1rem 1rem;
+  border-bottom: 1px solid rgba(212, 160, 23, 0.25);
+}
+
+.podium-title {
+  font-family: var(--font-title);
+  font-size: 1.4rem;
+  color: var(--gold-bright);
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.08em;
+}
+
+.podium-winner-name {
+  font-size: 1.6rem;
+  color: var(--text-primary);
+  margin: 0.5rem 0;
+}
+
+.podium-winner-score {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  color: var(--gold-bright);
+  text-shadow: 0 0 20px var(--gold-glow);
+}
+
+.podium-stars {
+  font-size: 1.2rem;
+  letter-spacing: 0.3em;
+  color: var(--gold-primary);
+  margin: 0.5rem 0;
+}
+
+.podium-rankings {
+  padding: 1rem;
+}
+
+.podium-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.4rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(212, 160, 23, 0.15);
+}
+
+.podium-row.rank-1 {
+  border-color: var(--gold-bright);
+  background: rgba(212, 160, 23, 0.12);
+}
+
+.podium-row.rank-2 {
+  border-color: #aaa;
+}
+
+.podium-row.rank-3 {
+  border-color: #cd7f32;
+}
+
+.podium-medal {
+  font-size: 1.25rem;
+  width: 2rem;
+  text-align: center;
+}
+
+.podium-rank-num {
+  font-family: var(--font-title);
+  color: var(--text-muted);
+  width: 1.5rem;
+}
+
+.podium-player-name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.podium-player-score {
+  font-family: var(--font-title);
+  color: var(--gold-primary);
+  font-weight: 700;
+}
+
+.podium-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-top: 1px solid rgba(212, 160, 23, 0.25);
+}
+
+/* ---- Score history chart placeholder ---- */
+
+.score-chart-mini {
+  height: 60px;
+  margin-top: 0.75rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-card);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 0.25rem 0.5rem;
+  gap: 2px;
+}
+
+.score-chart-bar {
+  flex: 1;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold-shadow));
+  border-radius: 2px 2px 0 0;
+  min-height: 4px;
+  opacity: 0.7;
+  transition: height 0.3s ease;
+}
+
+.score-chart-bar.winner-bar {
+  opacity: 1;
+  box-shadow: 0 0 8px var(--gold-glow);
+}
+
+/* ---- Record banner ---- */
+
+.record-banner {
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.25), transparent);
+  color: var(--gold-bright);
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  animation: perfect-bid-pulse 2s ease-in-out infinite;
+}

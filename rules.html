@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skull King — Règles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="pirate-bg" data-page="rules">
+
+  <div class="rules-wrapper container py-4">
+    <header class="mb-4">
+      <a href="index.html" class="btn-pirate btn-pirate-outline btn-pirate-sm mb-3">← Accueil</a>
+      <h1 class="logo-title">📖 Règles du jeu</h1>
+      <p class="text-muted-custom">Référence officielle Skull King — Grandpa Beck's Games</p>
+    </header>
+
+    <div class="accordion rules-accordion" id="rulesAccordion">
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#r1">Objectif & déroulement</button>
+        </h2>
+        <div id="r1" class="accordion-collapse collapse show" data-bs-parent="#rulesAccordion">
+          <div class="accordion-body">
+            <p>Skull King est un jeu de plis avec paris. Chaque manche, vous misez sur le nombre exact de plis que vous remporterez. Le gagnant cumule le plus de points après 10 manches (ou selon la variante).</p>
+            <ul>
+              <li>Manche N = N cartes par joueur</li>
+              <li>Phase de mise simultanée (« Yo-ho-ho ! »)</li>
+              <li>Jeux de plis en sens horaire</li>
+              <li>Le gagnant du pli entame le suivant</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#r2">Hiérarchie des cartes</button>
+        </h2>
+        <div id="r2" class="accordion-collapse collapse" data-bs-parent="#rulesAccordion">
+          <div class="accordion-body">
+            <p><strong>Ordre de puissance :</strong></p>
+            <p class="hierarchy-chain">Sirène &gt; Skull King &gt; Pirates &gt; Atout (noir) &gt; Couleurs &gt; Fuite</p>
+            <table class="table table-dark table-sm">
+              <thead><tr><th>Carte</th><th>Règle</th></tr></thead>
+              <tbody>
+                <tr><td>Fuite</td><td>Perd toujours — utile pour rater sa mise</td></tr>
+                <tr><td>Couleurs 1–14</td><td>La plus haute de la couleur menée gagne</td></tr>
+                <tr><td>Noir (atout)</td><td>Bat toutes les couleurs classiques</td></tr>
+                <tr><td>Pirate</td><td>Bat les numérotées ; entre pirates, le 1<sup>er</sup> joué gagne</td></tr>
+                <tr><td>Tigresse</td><td>Choix Pirate ou Fuite au moment du jeu</td></tr>
+                <tr><td>Skull King</td><td>Bat pirates et numérotées ; perd contre Sirène</td></tr>
+                <tr><td>Sirène</td><td>Bat SK et numérotées ; perd contre pirates</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#r3">Suivre la couleur</button>
+        </h2>
+        <div id="r3" class="accordion-collapse collapse" data-bs-parent="#rulesAccordion">
+          <div class="accordion-body">
+            <p>La 1<sup>re</sup> carte numérotée fixe la couleur à suivre. Les spéciales ignorent cette règle.</p>
+            <p>Si une <strong>Fuite</strong>, <strong>Butin</strong> ou <strong>Tigresse-fuite</strong> ouvre le pli, c'est le joueur suivant qui détermine la couleur.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#r4">Système Skull King (score)</button>
+        </h2>
+        <div id="r4" class="accordion-collapse collapse" data-bs-parent="#rulesAccordion">
+          <div class="accordion-body">
+            <ul>
+              <li>Mise exacte (≥1) : <strong>+20 × mise</strong></li>
+              <li>Mise ratée : <strong>−10 × écart</strong></li>
+              <li>Mise 0, 0 pli : <strong>+10 × cartes de la manche</strong></li>
+              <li>Mise 0, ≥1 pli : <strong>−10 × cartes de la manche</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#r5">Système Rascal</button>
+        </h2>
+        <div id="r5" class="accordion-collapse collapse" data-bs-parent="#rulesAccordion">
+          <div class="accordion-body">
+            <p>Potentiel = 10 pts × cartes distribuées. Écart 0 → 100%, écart 1 → 50%, écart ≥2 → 0%.</p>
+            <p><strong>Chevrotine</strong> (main ouverte) ou <strong>Boulet</strong> (poing) : le Boulet donne 15× cartes si exact, sinon 0.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#r6">Bonus</button>
+        </h2>
+        <div id="r6" class="accordion-collapse collapse" data-bs-parent="#rulesAccordion">
+          <div class="accordion-body">
+            <ul>
+              <li>14 vert/violet/jaune capturé : +10 pts</li>
+              <li>14 noir capturé : +20 pts</li>
+              <li>Pirate capture Sirène : +20 pts</li>
+              <li>Skull King capture Pirate : +30 pts</li>
+              <li>Sirène capture Skull King : +40 pts</li>
+              <li>Alliance Butin réussie : +20 pts chacun</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#r7">Extensions</button>
+        </h2>
+        <div id="r7" class="accordion-collapse collapse" data-bs-parent="#rulesAccordion">
+          <div class="accordion-body">
+            <p><strong>Kraken</strong> : annule le pli entier. Le suivant est entamé par celui qui aurait gagné.</p>
+            <p><strong>Baleine blanche</strong> : spéciales détruites, seule la valeur compte.</p>
+            <p><strong>Butin</strong> : alliance avec le gagnant du pli (+20 si les deux misent correctement).</p>
+            <p>Kraken + Baleine dans le même pli : la <strong>2<sup>e</sup> jouée</strong> l'emporte.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

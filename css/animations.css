@@ -1,0 +1,288 @@
+/* ==========================================================================
+   Skull King — Custom Animations
+   ========================================================================== */
+
+/* ---- Card fly to trick ---- */
+
+@keyframes card-fly-to-trick {
+  0% {
+    opacity: 0;
+    transform: translate(var(--fly-from-x, 0), var(--fly-from-y, 0)) scale(0.6) rotate(var(--fly-rotate, 0deg));
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+}
+
+.card-flying {
+  animation: card-fly-to-trick 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  z-index: 50;
+}
+
+/* ---- Trick win glow ---- */
+
+@keyframes trick-win-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px var(--gold-glow), 0 0 16px rgba(245, 200, 66, 0.3);
+    border-color: var(--gold-bright);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--gold-glow), 0 0 40px rgba(245, 200, 66, 0.5);
+    border-color: #fff;
+  }
+}
+
+.trick-win-glow {
+  animation: trick-win-glow 1.2s ease-in-out infinite;
+}
+
+/* ---- Cards scrape to winner ---- */
+
+@keyframes cards-scrape {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--scrape-x, 0), var(--scrape-y, 0)) scale(0.3);
+  }
+}
+
+.cards-scraping {
+  animation: cards-scrape 0.5s ease-in forwards;
+}
+
+/* ---- Deal animation ---- */
+
+@keyframes deal-card {
+  0% {
+    opacity: 0;
+    transform: translate(var(--deal-from-x, 0), var(--deal-from-y, 0)) scale(0.4) rotate(-15deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(0, -8px) scale(1.05) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+}
+
+.card-dealing {
+  animation: deal-card 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: var(--deal-delay, 0ms);
+}
+
+/* ---- Yo-ho-ho punch ---- */
+
+@keyframes yo-ho-ho-punch {
+  0%   { transform: scale(1) translateY(0); }
+  15%  { transform: scale(1.08) translateY(4px); }
+  30%  { transform: scale(0.95) translateY(-2px); }
+  45%  { transform: scale(1.06) translateY(3px); }
+  60%  { transform: scale(0.97) translateY(-1px); }
+  75%  { transform: scale(1.04) translateY(2px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.yo-ho-ho-punch {
+  animation: yo-ho-ho-punch 0.9s ease-in-out;
+}
+
+.yo-ho-ho-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 500;
+  pointer-events: none;
+}
+
+.yo-ho-ho-text {
+  font-family: var(--font-title);
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
+  color: var(--gold-bright);
+  text-shadow: 0 0 30px var(--gold-glow);
+  animation: yo-ho-ho-text 0.9s ease-in-out;
+}
+
+@keyframes yo-ho-ho-text {
+  0%, 100% { opacity: 0; transform: scale(0.8); }
+  20%, 80% { opacity: 1; transform: scale(1.1); }
+}
+
+.yo-ho-ho-fist {
+  font-size: 4rem;
+  animation: yo-ho-ho-punch 0.9s ease-in-out;
+}
+
+/* ---- Logo entrance (home) ---- */
+
+@keyframes logo-entrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(20px);
+  }
+  60% {
+    transform: scale(1.05) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-logo {
+  animation: logo-entrance 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes logo-glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 20px var(--gold-glow)); }
+  50%      { filter: drop-shadow(0 0 35px rgba(245, 200, 66, 0.6)); }
+}
+
+.animate-logo-glow {
+  animation: logo-glow-pulse 3s ease-in-out infinite;
+}
+
+/* ---- Skull King capture flash ---- */
+
+@keyframes sk-capture-flash {
+  0%, 100% { background-color: transparent; }
+  30%      { background-color: rgba(192, 57, 43, 0.4); }
+}
+
+.sk-capture-flash {
+  animation: sk-capture-flash 0.6s ease-out;
+}
+
+/* ---- Siren capture flash ---- */
+
+@keyframes siren-capture-flash {
+  0%, 100% { background-color: transparent; }
+  30%      { background-color: rgba(41, 128, 185, 0.45); }
+}
+
+.siren-capture-flash {
+  animation: siren-capture-flash 0.6s ease-out;
+}
+
+/* ---- Siren whirl ---- */
+
+@keyframes siren-whirl {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.15); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.siren-whirl {
+  animation: siren-whirl 0.8s ease-in-out;
+}
+
+/* ---- Score count up ---- */
+
+@keyframes score-count-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.2); color: var(--gold-bright); }
+  100% { transform: scale(1); }
+}
+
+.score-count-pop {
+  animation: score-count-pop 0.4s ease-out;
+}
+
+/* ---- Crown transfer ---- */
+
+@keyframes crown-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25%      { transform: translateY(-8px) rotate(-5deg); }
+  75%      { transform: translateY(-4px) rotate(5deg); }
+}
+
+.crown-bounce {
+  animation: crown-bounce 0.6s ease-out;
+}
+
+/* ---- Modal podium ---- */
+
+@keyframes podium-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.podium-animate {
+  animation: podium-rise 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.podium-animate:nth-child(2) { animation-delay: 0.15s; opacity: 0; }
+.podium-animate:nth-child(3) { animation-delay: 0.3s; opacity: 0; }
+.podium-animate:nth-child(4) { animation-delay: 0.45s; opacity: 0; }
+
+/* ---- Shake (failed bid) ---- */
+
+@keyframes shake-fail {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+
+.shake-fail {
+  animation: shake-fail 0.5s ease-in-out;
+}
+
+/* ---- Prefers reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card-game-inner {
+    transition: none;
+  }
+
+  .card-flying,
+  .card-dealing,
+  .cards-scraping,
+  .yo-ho-ho-punch,
+  .yo-ho-ho-text,
+  .animate-logo,
+  .animate-logo-glow,
+  .trick-win-glow,
+  .podium-animate {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .fog-layer span {
+    animation: none;
+  }
+
+  .player-badge.active-turn {
+    animation: none;
+    box-shadow: 0 0 8px var(--gold-glow);
+  }
+}

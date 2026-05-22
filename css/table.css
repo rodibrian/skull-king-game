@@ -1,0 +1,371 @@
+/* ==========================================================================
+   Skull King — Game Table Layout
+   ========================================================================== */
+
+.game-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: var(--header-h);
+  background: var(--bg-dark);
+}
+
+.game-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---- Table surface ---- */
+
+.game-table-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  min-height: 0;
+}
+
+.game-table {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  aspect-ratio: 1 / 1;
+  max-height: calc(100vh - var(--header-h) - 280px);
+  background:
+    radial-gradient(ellipse at center, rgba(20, 80, 45, 0.4) 0%, transparent 70%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    ),
+    linear-gradient(160deg, #1e4d2b 0%, var(--bg-felt) 35%, #0a2818 100%);
+  border-radius: 50% / 45%;
+  border: 6px solid var(--bg-table);
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.5),
+    inset 0 0 120px rgba(0, 0, 0, 0.3),
+    0 0 0 3px var(--gold-shadow),
+    0 8px 40px rgba(0, 0, 0, 0.8);
+  overflow: visible;
+}
+
+.game-table::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50% / 45%;
+  background: linear-gradient(145deg, #3d2a12 0%, var(--bg-table) 30%, #120c06 100%);
+  z-index: -1;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.9);
+}
+
+.game-table::after {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+/* Wood rail vignette */
+.game-table-rail {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50% / 45%;
+  pointer-events: none;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+/* ---- Central trick zone ---- */
+
+.trick-zone {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 42%;
+  height: 42%;
+  border-radius: 50%;
+  border: 2px dashed rgba(212, 160, 23, 0.25);
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.15) 0%, transparent 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trick-zone-label {
+  font-family: var(--font-title);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(212, 160, 23, 0.35);
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.trick-zone.has-cards .trick-zone-label {
+  display: none;
+}
+
+.trick-zone-cards {
+  position: absolute;
+  inset: 0;
+}
+
+/* Position trick cards around center based on player count */
+.trick-zone-cards .trick-card[data-seat="0"] { top: 72%; left: 50%; transform: translate(-50%, -50%); }
+.trick-zone-cards .trick-card[data-seat="1"] { top: 50%; left: 18%; transform: translate(-50%, -50%); }
+.trick-zone-cards .trick-card[data-seat="2"] { top: 18%; left: 28%; transform: translate(-50%, -50%); }
+.trick-zone-cards .trick-card[data-seat="3"] { top: 18%; left: 72%; transform: translate(-50%, -50%); }
+.trick-zone-cards .trick-card[data-seat="4"] { top: 50%; left: 82%; transform: translate(-50%, -50%); }
+.trick-zone-cards .trick-card[data-seat="5"] { top: 72%; left: 72%; transform: translate(-50%, -50%); }
+.trick-zone-cards .trick-card[data-seat="6"] { top: 82%; left: 50%; transform: translate(-50%, -50%); }
+.trick-zone-cards .trick-card[data-seat="7"] { top: 72%; left: 28%; transform: translate(-50%, -50%); }
+
+/* ---- Player zones ---- */
+
+.player-zone {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  z-index: 5;
+  min-width: 60px;
+}
+
+.player-zone-top {
+  top: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 85%;
+  gap: 0.75rem;
+}
+
+.player-zone-bottom {
+  bottom: 2%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+}
+
+.player-zone-left {
+  left: 1%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.player-zone-right {
+  right: 1%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Individual opponent slots within top row */
+.player-slot-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player-slot-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---- Player info badge ---- */
+
+.player-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(15, 10, 4, 0.85);
+  border: 1px solid rgba(212, 160, 23, 0.35);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-badge.active-turn {
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 12px var(--gold-glow);
+  animation: turn-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes turn-pulse {
+  0%, 100% { box-shadow: 0 0 8px var(--gold-glow); }
+  50%      { box-shadow: 0 0 16px var(--gold-glow); }
+}
+
+.player-badge .avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--bg-panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+
+.player-badge.is-human {
+  border-color: var(--info);
+}
+
+.player-badge.is-ai::after {
+  content: '🤖';
+  font-size: 0.6rem;
+}
+
+.player-stats-mini {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.player-stats-mini .bid-count {
+  color: var(--gold-primary);
+}
+
+.player-stats-mini .trick-count {
+  color: var(--success);
+}
+
+/* ---- Layout variants by player count ---- */
+
+.game-table.players-2 .player-zone-top { display: none; }
+.game-table.players-2 .player-zone-left,
+.game-table.players-2 .player-zone-right { display: none; }
+.game-table.players-2 .player-slot-top:nth-child(n+2) { display: none; }
+
+.game-table.players-3 .player-slot-top:nth-child(n+2) { display: none; }
+.game-table.players-3 .player-zone-left .player-slot-side:nth-child(n+2),
+.game-table.players-3 .player-zone-right .player-slot-side:nth-child(n+2) { display: none; }
+
+.game-table.players-4 .player-slot-top:nth-child(n+3),
+.game-table.players-4 .player-zone-left .player-slot-side:nth-child(n+2),
+.game-table.players-4 .player-zone-right .player-slot-side:nth-child(n+2) { display: none; }
+
+.game-table.players-5 .player-slot-top:nth-child(n+3),
+.game-table.players-5 .player-zone-right .player-slot-side:nth-child(n+2) { display: none; }
+
+.game-table.players-6 .player-slot-top:nth-child(n+3) { display: none; }
+
+.game-table.players-7 .player-slot-top:nth-child(n+4) { display: none; }
+
+/* ---- Human player area ---- */
+
+.human-area {
+  flex-shrink: 0;
+  background: linear-gradient(0deg, rgba(15, 10, 4, 0.98) 0%, rgba(26, 18, 8, 0.9) 100%);
+  border-top: 2px solid var(--gold-shadow);
+}
+
+.human-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  border-bottom: 1px solid rgba(212, 160, 23, 0.15);
+}
+
+.human-info-bar .bid-status {
+  color: var(--text-muted);
+}
+
+.human-info-bar .bid-status strong {
+  color: var(--gold-bright);
+}
+
+.human-info-bar .trick-status strong {
+  color: var(--success);
+}
+
+/* ---- Side panels overlay (desktop) ---- */
+
+.game-panels-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 0.5rem 0.5rem;
+}
+
+/* ---- Deck pile (deal animation origin) ---- */
+
+.deck-pile {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.deck-pile .card-game {
+  --card-w: 40px;
+  --card-h: 56px;
+}
+
+/* ---- Desktop layout ---- */
+
+@media (min-width: 1024px) {
+  .game-screen {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+  }
+
+  .game-main {
+    flex: 1 1 65%;
+    min-width: 0;
+  }
+
+  .game-table {
+    max-height: calc(100vh - var(--header-h) - 200px);
+  }
+
+  .card-game {
+    --card-w: 64px;
+    --card-h: 92px;
+  }
+
+  .game-panels-row {
+    flex: 0 0 320px;
+    padding: 0.75rem;
+    max-height: calc(100vh - var(--header-h));
+    overflow-y: auto;
+  }
+
+  .human-area .card-game {
+    --card-w: 72px;
+    --card-h: 102px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .game-table-wrapper {
+    padding: 1.5rem;
+  }
+
+  .game-table {
+    max-width: 800px;
+  }
+}
