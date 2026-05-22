@@ -7,7 +7,9 @@
   'use strict';
 
   let selectedCardId = null;
+  let selectedDiscardIds = [];
   let sortableHand = null;
+  let powerModalShowing = false;
 
   const SEAT_POSITIONS = {
     2: ['bottom', 'top'],
@@ -223,6 +225,11 @@
     const $btn = $('#btn-action');
     const hi = state.humanIndex;
 
+    if (state.pendingPower) {
+      $btn.prop('disabled', true).text('Pouvoir pirate en cours…');
+      return;
+    }
+
     if (state.phase === 'BID' && !state.bidsSubmitted[hi]) {
       $btn.prop('disabled', false).text('Confirmer la mise').off('click').on('click', function () {
         const bid = parseInt($('.bid-btn.selected').data('bid'), 10) || 0;
@@ -253,11 +260,12 @@
    */
   function handleTigresseModal(state) {
     if (state.pendingTigresse && state.pendingTigresse.playerIndex === state.humanIndex) {
-      const modal = new bootstrap.Modal('#tigresseModal');
-      modal.show();
+      openModal('#tigresseModal');
       $('#tigresse-pirate, #tigresse-fuite').off('click').on('click', function () {
-        modal.hide();
-        window.SKGame.confirmTigresse($(this).data('mode'));
+        const mode = $(this).data('mode');
+        closeModal('#tigresseModal', function () {
+          window.SKGame.confirmTigresse(mode);
+        });
       });
     }
   }
@@ -280,7 +288,7 @@
         '</div>'
       );
     });
-    new bootstrap.Modal('#gameEndModal').show();
+    openModal('#gameEndModal');
   }
 
   /**
@@ -297,8 +305,230 @@
     renderBidPanel(state);
     renderMessages(state);
     handleTigresseModal(state);
+    handlePendingPower(state);
 
     if (window.SKGuide) window.SKGuide.updateHelp(state);
+  }
+
+  /**
+   * Supprime les backdrops Bootstrap orphelins qui bloquent l'écran.
+   */
+  function cleanupModalBackdrops() {
+    $('.modal-backdrop').remove();
+    $('body').removeClass('modal-open').css({ overflow: '', paddingRight: '' });
+    $('.modal.show').each(function () {
+      $(this).removeClass('show').attr('aria-hidden', 'true').css('display', 'none');
+    });
+    powerModalShowing = false;
+  }
+
+  /**
+   * Ouvre une modale Bootstrap (instance unique par élément).
+   * @param {string} selector
+   * @param {Function} [onShown]
+   * @returns {bootstrap.Modal|null}
+   */
+  function openModal(selector, onShown) {
+    const el = document.querySelector(selector);
+    if (!el) return null;
+    cleanupModalBackdrops();
+    const inst = bootstrap.Modal.getOrCreateInstance(el);
+    if (onShown) {
+      $(el).one('shown.bs.modal', onShown);
+    }
+    inst.show();
+    return inst;
+  }
+
+  /**
+   * Ferme une modale puis nettoie le backdrop.
+   * @param {string} selector
+   * @param {Function} [callback]
+   */
+  function closeModal(selector, callback) {
+    const el = document.querySelector(selector);
+    if (!el) {
+      cleanupModalBackdrops();
+      if (callback) callback();
+      return;
+    }
+    const inst = bootstrap.Modal.getInstance(el);
+    if (inst) {
+      $(el).one('hidden.bs.modal', function () {
+        cleanupModalBackdrops();
+        if (callback) callback();
+      });
+      inst.hide();
+    } else {
+      cleanupModalBackdrops();
+      if (callback) callback();
+    }
+  }
+
+  /**
+   * Ferme la modale de pouvoir pirate active.
+   * @param {Function} [callback]
+   */
+  function closePowerModal(callback) {
+    powerModalShowing = false;
+    closeModal('#powerActiveModal', callback);
+  }
+
+  /** @deprecated alias */
+  function hidePowerModal(callback) {
+    closePowerModal(callback);
+  }
+  /**
+   * Affiche la modale de pouvoir pirate pour le joueur humain.
+   * @param {Object} state
+   */
+  function showPowerModal(state) {
+    if (powerModalShowing) return;
+
+    const power = state.pendingPower;
+    if (!power) return;
+
+    if (power.pirateId === 'bendt' && power.step === 'will_draw') {
+      window.SKGame.executerActionPouvoir({ type: 'will_start' });
+      return;
+    }
+
+    const $body = $('#power-active-body');
+    const $footer = $('#power-active-footer');
+    $body.empty();
+    $footer.empty();
+
+    $('#powerActiveModalLabel').text(power.icon + ' ' + power.nom);
+
+    if (power.pirateId === 'tessi') {
+      $body.append('<p>Choisissez qui entame le <strong>prochain pli</strong> :</p>');
+      const $list = $('<div class="power-player-list d-flex flex-wrap gap-2">');
+      state.players.forEach(function (p) {
+        if (p.isBarbeGrise) return;
+        $list.append(
+          $('<button type="button" class="btn btn-pirate btn-pirate-sm">').text(p.name).data('target', p.index)
+        );
+      });
+      $body.append($list);
+      $list.on('click', 'button', function () {
+        const target = $(this).data('target');
+        closePowerModal(function () {
+          window.SKGame.executerActionPouvoir({ type: 'rosie', targetIndex: target });
+        });
+      });
+    } else if (power.step === 'will_discard') {
+      selectedDiscardIds = [];
+      const hi = power.playerIndex;
+      const need = Math.min(2, (state.hands[hi] || []).length);
+      $body.append('<p>Will le Bandit : choisissez <strong>' + need + ' carte(s) à défausser</strong> :</p>');
+      const $cards = $('<div class="power-discard-hand d-flex flex-wrap gap-2">');
+      (state.hands[hi] || []).forEach(function (carte) {
+        $cards.append(createCardEl(carte, { faceUp: true }).addClass('power-discard-pick'));
+      });
+      $body.append($cards);
+      $footer.append('<button type="button" class="btn btn-pirate" id="btn-will-discard" disabled>Défausser (0/' + need + ')</button>');
+      $cards.on('click', '.power-discard-pick', function () {
+        const id = $(this).data('card-id');
+        const idx = selectedDiscardIds.indexOf(id);
+        if (idx >= 0) {
+          selectedDiscardIds.splice(idx, 1);
+          $(this).removeClass('selected');
+        } else if (selectedDiscardIds.length < need) {
+          selectedDiscardIds.push(id);
+          $(this).addClass('selected');
+        }
+        $('#btn-will-discard').prop('disabled', selectedDiscardIds.length !== need)
+          .text('Défausser (' + selectedDiscardIds.length + '/' + need + ')');
+      });
+      $('#btn-will-discard').on('click', function () {
+        const ids = selectedDiscardIds.slice();
+        closePowerModal(function () {
+          window.SKGame.executerActionPouvoir({ type: 'will_discard', cardIds: ids });
+        });
+      });
+    } else if (power.pirateId === 'rascal') {
+      $body.append('<p>Rascal le Flambeur : pariez des points supplémentaires :</p>');
+      $body.append(
+        '<div class="d-flex gap-2 justify-content-center">' +
+          '<button type="button" class="btn btn-pirate" data-montant="0">0 pt</button>' +
+          '<button type="button" class="btn btn-pirate" data-montant="10">+10 pts</button>' +
+          '<button type="button" class="btn btn-pirate" data-montant="20">+20 pts</button>' +
+        '</div>'
+      );
+      $body.find('button').on('click', function () {
+        const montant = parseInt($(this).data('montant'), 10);
+        closePowerModal(function () {
+          window.SKGame.executerActionPouvoir({ type: 'rascal', montant: montant });
+        });
+      });
+    } else if (power.pirateId === 'juanita') {
+      $body.append('<p>Juanita Jade révèle les cartes restantes du deck…</p>');
+      $footer.append('<button type="button" class="btn btn-pirate" id="btn-juanita-ok">Voir les cartes</button>');
+      $('#btn-juanita-ok').on('click', function () {
+        window.SKGame.executerActionPouvoir({ type: 'juanita' });
+      });
+    } else if (power.pirateId === 'harry') {
+      const p = state.players[power.playerIndex];
+      $body.append(
+        '<p>Harry le Géant : modifiez votre mise (actuelle : <strong>' + p.bid + '</strong>) :</p>' +
+        '<div class="d-flex gap-2 justify-content-center">' +
+          '<button type="button" class="btn btn-pirate-outline btn-pirate" data-delta="-1">−1</button>' +
+          '<button type="button" class="btn btn-pirate" data-delta="0">Inchangée</button>' +
+          '<button type="button" class="btn btn-pirate-outline btn-pirate" data-delta="1">+1</button>' +
+        '</div>'
+      );
+      $body.find('button').on('click', function () {
+        const delta = parseInt($(this).data('delta'), 10);
+        closePowerModal(function () {
+          window.SKGame.executerActionPouvoir({ type: 'harry', delta: delta });
+        });
+      });
+    }
+
+    powerModalShowing = true;
+    openModal('#powerActiveModal');
+  }
+
+  /**
+   * Affiche les cartes vues par Juanita.
+   * @param {Object[]} cartes
+   * @param {Function} [onClose]
+   */
+  function showJuanitaCards(cartes, onClose) {
+    const $row = $('#juanita-cards');
+    $row.empty();
+    if (!cartes.length) {
+      $row.append('<p class="text-muted-custom">Aucune carte restante dans le deck.</p>');
+    } else {
+      cartes.forEach(function (c) {
+        $row.append(createCardEl(c, { faceUp: true }));
+      });
+    }
+    const $modal = $('#juanitaModal');
+    $modal.off('hidden.juanita').on('hidden.juanita', function () {
+      cleanupModalBackdrops();
+      if (onClose) onClose();
+    });
+    openModal('#juanitaModal');
+  }
+
+  /**
+   * Gère l'affichage du pouvoir en attente.
+   * @param {Object} state
+   */
+  function handlePendingPower(state) {
+    if (!state.pendingPower) {
+      powerModalShowing = false;
+      return;
+    }
+    const power = state.pendingPower;
+    if (power.playerIndex === state.humanIndex &&
+        power.step !== 'will_draw' &&
+        !powerModalShowing &&
+        !$('#powerActiveModal').hasClass('show')) {
+      showPowerModal(state);
+    }
+    updateActionButton(state);
   }
 
   /**
@@ -342,6 +572,13 @@
   window.SKUI = {
     renderAll,
     showGameEnd,
-    createCardEl
+    createCardEl,
+    showPowerModal,
+    showJuanitaCards,
+    hidePowerModal,
+    closePowerModal,
+    cleanupModalBackdrops,
+    openModal,
+    closeModal
   };
 })(window, jQuery);

@@ -266,7 +266,39 @@
     </div>
   </div>
 
-  <!-- Modal: Pirate powers -->
+  <!-- Modal: Pouvoir pirate actif -->
+  <div class="modal fade" id="powerActiveModal" tabindex="-1" aria-labelledby="powerActiveModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="powerActiveModalLabel">🏴‍☠️ Pouvoir activé</h2>
+        </div>
+        <div class="modal-body" id="power-active-body"></div>
+        <div class="modal-footer" id="power-active-footer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Juanita — cartes secrètes -->
+  <div class="modal fade" id="juanitaModal" tabindex="-1" aria-labelledby="juanitaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="juanitaModalLabel">💎 Juanita Jade — Cartes restantes</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <p class="form-text">Vue secrète du deck (non distribué) :</p>
+          <div id="juanita-cards" class="juanita-cards-row d-flex flex-wrap gap-2"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-pirate" data-bs-dismiss="modal">Compris</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Pirate powers (aide) -->
   <div class="modal fade" id="piratePowersModal" tabindex="-1" aria-labelledby="piratePowersModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
@@ -279,35 +311,35 @@
             <span class="extension-icon">🌹</span>
             <div>
               <strong>Rosie la Douce</strong>
-              <p class="form-text mb-0">Regarde les 2 cartes du dessus du deck avant de jouer.</p>
+              <p class="form-text mb-0">Choisit qui entame le prochain pli (si vous gagnez avec elle).</p>
             </div>
           </div>
           <div class="extension-card mb-3">
             <span class="extension-icon">🎭</span>
             <div>
               <strong>Will le Bandit</strong>
-              <p class="form-text mb-0">Échange une carte de sa main avec un adversaire au hasard.</p>
+              <p class="form-text mb-0">Pioche 2 cartes et en défausse 2 (si vous gagnez avec lui).</p>
             </div>
           </div>
           <div class="extension-card mb-3">
             <span class="extension-icon">🎲</span>
             <div>
               <strong>Rascal le Flambeur</strong>
-              <p class="form-text mb-0">Double sa mise ou l'annule (0 pli) avant la révélation.</p>
+              <p class="form-text mb-0">Parie 0, 10 ou 20 pts supplémentaires (gagné si mise correcte).</p>
             </div>
           </div>
           <div class="extension-card mb-3">
             <span class="extension-icon">💎</span>
             <div>
               <strong>Juanita Jade</strong>
-              <p class="form-text mb-0">Choisit quel joueur entame le prochain pli.</p>
+              <p class="form-text mb-0">Regarde secrètement les cartes non distribuées.</p>
             </div>
           </div>
           <div class="extension-card">
             <span class="extension-icon">💪</span>
             <div>
               <strong>Harry le Géant</strong>
-              <p class="form-text mb-0">Force un adversaire à jouer en premier au prochain pli.</p>
+              <p class="form-text mb-0">Modifie sa mise de ±1 en fin de manche (après le dernier pli).</p>
             </div>
           </div>
         </div>
@@ -407,6 +439,7 @@
   <script src="js/cards.js"></script>
   <script src="js/scoring.js"></script>
   <script src="js/tricks.js"></script>
+  <script src="js/powers.js"></script>
   <script src="js/bidding.js"></script>
   <script src="js/ai.js"></script>
   <script src="js/ui.js"></script>

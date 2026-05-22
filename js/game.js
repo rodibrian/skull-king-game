@@ -36,11 +36,132 @@
 
   /**
    * Sérialise l'état pour le stockage (IDs de cartes uniquement).
-   * @returns {Object}
+   * @returns {Object|null}
    */
+  function carteToId(c) {
+    if (!c) return c;
+    return typeof c === 'string' ? c : c.id;
+  }
+
+  function serialiserCartes(liste) {
+    return (liste || []).map(carteToId);
+  }
+
+  function serialiserEntreesPli(entrees) {
+    return (entrees || []).map(function (e) {
+      return {
+        joueurIndex: e.joueurIndex,
+        carte: carteToId(e.carte),
+        modeTigresse: e.modeTigresse || null,
+        ordre: e.ordre
+      };
+    });
+  }
+
   function serializeState() {
     if (!state) return null;
-    return JSON.parse(JSON.stringify(state));
+    return {
+      phase: state.phase,
+      config: state.config,
+      variante: state.variante,
+      roundIndex: state.roundIndex,
+      dealer: state.dealer,
+      deck: serialiserCartes(state.deck),
+      discard: state.discard,
+      hands: state.hands.map(serialiserCartes),
+      bids: state.bids,
+      bidsSubmitted: state.bidsSubmitted,
+      currentTrick: {
+        cards: serialiserEntreesPli(state.currentTrick.cards),
+        leadPlayer: state.currentTrick.leadPlayer
+      },
+      currentPlayer: state.currentPlayer,
+      trickStarter: state.trickStarter,
+      tricksPlayed: state.tricksPlayed,
+      players: state.players.map(function (p) {
+        return {
+          index: p.index,
+          name: p.name,
+          type: p.type,
+          aiLevel: p.aiLevel,
+          isHuman: p.isHuman,
+          isBarbeGrise: p.isBarbeGrise,
+          score: p.score,
+          bid: p.bid,
+          rascalChoice: p.rascalChoice,
+          tricksWon: p.tricksWon,
+          tricksWonDetails: (p.tricksWonDetails || []).map(function (pli) {
+            return {
+              joueurIndex: pli.joueurIndex,
+              cartes: serialiserEntreesPli(pli.cartes),
+              allianceButin: pli.allianceButin,
+              joueurButin: pli.joueurButin
+            };
+          }),
+          roundScore: p.roundScore,
+          pariRascalFlambeur: p.pariRascalFlambeur || 0,
+          harryPowerAvailable: !!p.harryPowerAvailable
+        };
+      }),
+      humanIndex: state.humanIndex,
+      pendingTigresse: state.pendingTigresse,
+      pendingPower: state.pendingPower,
+      messages: state.messages || [],
+      barbeGriseDeck: serialiserCartes(state.barbeGriseDeck)
+    };
+  }
+
+  /**
+   * Instancie une carte depuis un id ou un objet.
+   * @param {string|Object} ref
+   * @returns {Object}
+   */
+  function instancierRef(ref) {
+    if (!ref) return ref;
+    if (typeof ref === 'string') {
+      return window.SKCards.instancierCarte(ref);
+    }
+    if (ref.id && ref.type) {
+      return { ...ref };
+    }
+    return ref;
+  }
+
+  /**
+   * Reconstruit les objets carte depuis les IDs.
+   */
+  function rehydrateHands() {
+    if (!state || !window.SKCards) return;
+
+    state.hands = (state.hands || []).map(function (hand) {
+      return hand.map(instancierRef);
+    });
+    state.deck = (state.deck || []).map(instancierRef);
+    state.barbeGriseDeck = (state.barbeGriseDeck || []).map(instancierRef);
+
+    if (state.currentTrick && state.currentTrick.cards) {
+      state.currentTrick.cards = state.currentTrick.cards.map(function (e) {
+        return {
+          joueurIndex: e.joueurIndex,
+          carte: instancierRef(e.carte),
+          modeTigresse: e.modeTigresse,
+          ordre: e.ordre
+        };
+      });
+    }
+
+    state.players.forEach(function (p) {
+      (p.tricksWonDetails || []).forEach(function (pli) {
+        pli.cartes = (pli.cartes || []).map(function (e) {
+          return {
+            joueurIndex: e.joueurIndex,
+            carte: instancierRef(e.carte),
+            modeTigresse: e.modeTigresse,
+            ordre: e.ordre
+          };
+        });
+      });
+    });
   }
 
   /**
@@ -50,29 +171,8 @@
   function restore(saved) {
     state = saved;
     rehydrateHands();
+    if (window.SKUI) window.SKUI.cleanupModalBackdrops();
     emit();
-  }
-
-  /**
-   * Reconstruit les objets carte depuis les IDs.
-   */
-  function rehydrateHands() {
-    if (!state || !window.SKCards) return;
-    state.hands = state.hands.map(function (hand) {
-      return hand.map(function (id) {
-        return typeof id === 'string' ? window.SKCards.instancierCarte(id) : id;
-      });
-    });
-    if (state.currentTrick && state.currentTrick.cards) {
-      state.currentTrick.cards = state.currentTrick.cards.map(function (e) {
-        return {
-          joueurIndex: e.joueurIndex,
-          carte: typeof e.carte === 'string' ? window.SKCards.instancierCarte(e.carte) : e.carte,
-          modeTigresse: e.modeTigresse,
-          ordre: e.ordre
-        };
-      });
-    }
   }
 
   /**
@@ -188,6 +288,8 @@
       p.tricksWonDetails = [];
       p.bid = null;
       p.roundScore = { pointsMise: 0, bonus: 0, total: 0 };
+      p.pariRascalFlambeur = 0;
+      p.harryPowerAvailable = false;
     });
 
     let cardIndex = 0;
@@ -304,6 +406,7 @@
    */
   function playCard(playerIndex, cardId, modeTigresse) {
     if (state.phase !== PHASE.PLAY) return false;
+    if (state.pendingPower) return false;
     if (state.currentPlayer !== playerIndex) return false;
 
     const hand = state.hands[playerIndex];
@@ -356,17 +459,172 @@
   }
 
   /**
+   * Poursuit le déroulement après résolution d'un pli (pli suivant ou fin de manche).
+   */
+  function continueAfterTrick() {
+    const cardsPerRound = cardsThisRound();
+    if (state.tricksPlayed >= cardsPerRound) {
+      endRound();
+    } else {
+      emit();
+      processAI();
+    }
+  }
+
+  /**
+   * Déclenche le pouvoir pirate après victoire au pli.
+   * @param {Object[]} cartesPli
+   * @param {number} gagnantIndex
+   * @param {boolean} pliDetruit
+   */
+  function declencherPouvoirPirate(cartesPli, gagnantIndex, pliDetruit) {
+    if (!state.config.advancedPowers || !window.SKPowers) {
+      return false;
+    }
+
+    const pouvoir = window.SKPowers.detecterPouvoir(cartesPli, gagnantIndex, pliDetruit);
+    if (!pouvoir) {
+      return false;
+    }
+
+    const joueur = state.players[pouvoir.playerIndex];
+    if (joueur.isBarbeGrise) {
+      return false;
+    }
+
+    if (pouvoir.pirateId === 'harry') {
+      joueur.harryPowerAvailable = true;
+      state.messages.push('💪 ' + joueur.name + ' peut modifier sa mise en fin de manche (Harry le Géant).');
+      return false;
+    }
+
+    state.pendingPower = {
+      pirateId: pouvoir.pirateId,
+      playerIndex: pouvoir.playerIndex,
+      nom: pouvoir.nom,
+      icon: pouvoir.icon,
+      step: pouvoir.pirateId === 'bendt' ? 'will_draw' : 'choose'
+    };
+    state.phase = PHASE.PLAY;
+    emit();
+
+    if (!joueur.isHuman) {
+      setTimeout(function () { resoudrePouvoirIA(); }, 600);
+    } else if (window.SKUI) {
+      window.SKUI.showPowerModal(state);
+    }
+    return true;
+  }
+
+  /**
+   * Résout automatiquement un pouvoir pour l'IA.
+   */
+  function resoudrePouvoirIA() {
+    if (!state.pendingPower || !window.SKPowers) return;
+    const action = window.SKPowers.resoudreIA(state, state.pendingPower);
+    if (action) {
+      executerActionPouvoir(action);
+    } else {
+      terminerPouvoir();
+    }
+  }
+
+  /**
+   * Exécute une action de pouvoir pirate.
+   * @param {Object} action
+   */
+  function executerActionPouvoir(action) {
+    if (!state.pendingPower || !window.SKPowers) return;
+
+    const idx = state.pendingPower.playerIndex;
+
+    switch (action.type) {
+      case 'rosie':
+        window.SKPowers.appliquerRosie(state, action.targetIndex);
+        terminerPouvoir();
+        break;
+
+      case 'will_start':
+        window.SKPowers.piocherWill(state, idx);
+        state.pendingPower.step = 'will_discard';
+        state.pendingPower.discardCount = Math.min(2, state.hands[idx].length);
+        emit();
+        if (state.players[idx].isHuman) {
+          if (window.SKUI) window.SKUI.showPowerModal(state);
+        } else {
+          const ids = window.SKPowers.choisirDefausseIA(state, idx);
+          window.SKPowers.defausserWill(state, idx, ids.slice(0, state.pendingPower.discardCount));
+          terminerPouvoir();
+        }
+        break;
+
+      case 'will_discard':
+        window.SKPowers.defausserWill(state, idx, action.cardIds || []);
+        terminerPouvoir();
+        break;
+
+      case 'rascal':
+        window.SKPowers.appliquerRascalFlambeur(state, idx, action.montant);
+        terminerPouvoir();
+        break;
+
+      case 'juanita': {
+        const cartes = window.SKPowers.voirDeckJuanita(state);
+        state.messages.push('💎 Juanita Jade consulte ' + cartes.length + ' cartes restantes.');
+        if (state.players[idx].isHuman && window.SKUI) {
+          window.SKUI.closePowerModal(function () {
+            window.SKUI.showJuanitaCards(cartes, function () {
+              terminerPouvoir();
+            });
+          });
+        } else {
+          terminerPouvoir();
+        }
+        break;
+      }
+
+      case 'harry':
+        window.SKPowers.appliquerHarry(state, idx, action.delta);
+        state.players[idx].harryPowerAvailable = false;
+        terminerPouvoirHarry();
+        break;
+
+      default:
+        terminerPouvoir();
+    }
+  }
+
+  /**
+   * Termine la phase de pouvoir et reprend le jeu.
+   */
+  function terminerPouvoir() {
+    state.pendingPower = null;
+    emit();
+    continueAfterTrick();
+  }
+
+  /**
+   * Termine le pouvoir Harry en fin de manche.
+   */
+  function terminerPouvoirHarry() {
+    state.pendingPower = null;
+    emit();
+    calculerScoresManche();
+  }
+
+  /**
    * Résout le pli en cours.
    */
   function resolveCurrentTrick() {
-    const result = window.SKTricks.resoudrePli(state.currentTrick.cards);
+    const cartesPli = state.currentTrick.cards.map(function (e) { return { ...e }; });
+    const result = window.SKTricks.resoudrePli(cartesPli);
     const msg = [];
 
     if (result.pliDetruit) {
       if (result.raison && result.raison.indexOf('kraken') >= 0) {
         msg.push('LE KRAKEN A TOUT DÉTRUIT ! 🐙');
       }
-      state.discard.push(...state.currentTrick.cards);
+      state.discard.push(...cartesPli);
       state.trickStarter = result.prochainMeneur != null
         ? result.prochainMeneur
         : state.trickStarter;
@@ -374,12 +632,12 @@
       const winner = state.players[result.gagnant];
       winner.tricksWon += 1;
 
-      const butinEntry = state.currentTrick.cards.find(function (e) {
+      const butinEntry = cartesPli.find(function (e) {
         return e.carte.type === 'butin';
       });
       const pliDetail = {
         joueurIndex: result.gagnant,
-        cartes: state.currentTrick.cards.map(function (e) { return { ...e }; }),
+        cartes: cartesPli.map(function (e) { return { ...e }; }),
         allianceButin: !!butinEntry && butinEntry.joueurIndex !== result.gagnant,
         joueurButin: butinEntry ? butinEntry.joueurIndex : null
       };
@@ -394,19 +652,50 @@
     state.currentPlayer = state.trickStarter;
     state.tricksPlayed += 1;
 
-    const cardsPerRound = cardsThisRound();
-    if (state.tricksPlayed >= cardsPerRound) {
-      endRound();
-    } else {
-      emit();
-      processAI();
+    if (result.gagnant >= 0 && !result.pliDetruit &&
+        declencherPouvoirPirate(cartesPli, result.gagnant, false)) {
+      return;
     }
+
+    continueAfterTrick();
   }
 
   /**
-   * Termine la manche et calcule les scores.
+   * Propose le pouvoir Harry avant le calcul des scores.
+   * @returns {boolean}
    */
-  function endRound() {
+  function declencherHarryFinManche() {
+    if (!state.config.advancedPowers || !window.SKPowers) return false;
+
+    const joueurHarry = state.players.find(function (p) {
+      return p.harryPowerAvailable && !p.isBarbeGrise;
+    });
+
+    if (!joueurHarry) return false;
+
+    state.pendingPower = {
+      pirateId: 'harry',
+      playerIndex: joueurHarry.index,
+      nom: 'Harry le Géant',
+      icon: '💪',
+      step: 'harry_bid',
+      harryFinManche: true
+    };
+
+    emit();
+
+    if (!joueurHarry.isHuman) {
+      setTimeout(function () { resoudrePouvoirIA(); }, 600);
+    } else if (window.SKUI) {
+      window.SKUI.showPowerModal(state);
+    }
+    return true;
+  }
+
+  /**
+   * Calcule et applique les scores de la manche.
+   */
+  function calculerScoresManche() {
     const cartes = cardsThisRound();
     const systeme = state.config.scoring.system || 'skull_king';
 
@@ -433,6 +722,7 @@
 
       p.roundScore = score;
       p.score += score.total;
+      p.harryPowerAvailable = false;
     });
 
     state.phase = PHASE.SCORE;
@@ -448,6 +738,16 @@
         startRound();
       }
     }, 2500);
+  }
+
+  /**
+   * Termine la manche et calcule les scores.
+   */
+  function endRound() {
+    if (declencherHarryFinManche()) {
+      return;
+    }
+    calculerScoresManche();
   }
 
   /**
@@ -491,6 +791,7 @@
    */
   function processAI() {
     if (!state || state.phase === PHASE.END) return;
+    if (state.pendingPower) return;
 
     if (state.phase === PHASE.BID) {
       state.players.forEach(function (p, i) {
@@ -558,6 +859,9 @@
     getCouleurASuivre,
     cardsThisRound,
     processAI,
-    serializeState
+    serializeState,
+    executerActionPouvoir,
+    terminerPouvoir,
+    resoudrePouvoirIA
   };
 })(window);

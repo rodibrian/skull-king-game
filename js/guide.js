@@ -11,6 +11,7 @@
          '<p>Frappez la table mentalement… puis confirmez votre mise !</p>',
     PLAY: '<p>Jouez une carte en respectant la <strong>couleur menée</strong> si vous en possédez une.</p>' +
           '<p>Les cartes spéciales (Pirates, Sirène, Skull King…) ignorent cette règle.</p>',
+    POWER: '<p><strong>Pouvoir pirate activé !</strong> Gagnez un pli avec un pirate pour déclencher son pouvoir (si option activée).</p>',
     SCORE: '<p>Les scores de la manche sont calculés selon le système choisi.</p>' +
            '<p>Les bonus s\'ajoutent pour les captures spéciales et les 14 remportés.</p>',
     END: '<p>Partie terminée ! Consultez le podium pour voir le Capitaine des Sept Mers.</p>'
@@ -26,13 +27,20 @@
 
     let html = HELP[state.phase] || HELP.PLAY;
 
-    if (state.phase === 'PLAY' && state.currentTrick.cards.length === 0) {
+    if (state.pendingPower) {
+      html = HELP.POWER + '<p class="mt-2">' + state.pendingPower.icon + ' <strong>' +
+        state.pendingPower.nom + '</strong></p>';
+    } else if (state.phase === 'PLAY' && state.currentTrick.cards.length === 0) {
       html += '<p class="form-text mt-2">Vous <strong>entamez</strong> le pli — toute carte est permise.</p>';
     } else if (state.phase === 'PLAY') {
       const couleur = window.SKGame.getCouleurASuivre();
       if (couleur) {
         html += '<p class="form-text mt-2">Couleur à suivre : <strong>' + couleur + '</strong></p>';
       }
+    }
+
+    if (state.config.advancedPowers && state.phase === 'PLAY' && !state.pendingPower) {
+      html += '<p class="form-text mt-2">🏴‍☠️ Pouvoirs avancés actifs — gagnez un pli avec un pirate pour l\'activer.</p>';
     }
 
     $text.html(html);

@@ -74,19 +74,7 @@
   function initGamePage() {
     loadPrefs();
 
-    const params = new URLSearchParams(window.location.search);
-    const resume = params.get('resume') === '1';
     let config = null;
-
-    if (resume && window.SKStorage && window.SKStorage.hasSavedGame()) {
-      const saved = window.SKStorage.loadGame();
-      if (saved && window.SKGame) {
-        window.SKGame.restore(saved);
-        if (window.SKUI) window.SKUI.renderAll(window.SKGame.getState());
-        window.SKGame.processAI();
-        return;
-      }
-    }
 
     try {
       const raw = sessionStorage.getItem('sk_new_game_config');
@@ -96,8 +84,17 @@
       }
     } catch (e) { /* ignore */ }
 
-    if (!config && window.SKStorage) {
-      config = window.SKStorage.loadPreferences();
+    if (!config && window.SKStorage && window.SKStorage.hasSavedGame()) {
+      const saved = window.SKStorage.loadGame();
+      if (saved && window.SKGame) {
+        window.SKGame.restore(saved);
+        if (window.SKUI) {
+          window.SKUI.cleanupModalBackdrops();
+          window.SKUI.renderAll(window.SKGame.getState());
+        }
+        window.SKGame.processAI();
+        return;
+      }
     }
 
     if (!config || !config.players) {
